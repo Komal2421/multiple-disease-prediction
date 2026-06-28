@@ -1,0 +1,98 @@
+ <!DOCTYPE html>
+<html>
+
+<head>
+    <title>Multiple Disease Prediction System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🩺 Multiple Disease Prediction System</h1>
+    <p>Select a disease and enter the patient details.</p>
+
+    <form action="/predict" method="POST">
+
+        <label>Select Disease</label>
+
+        <select name="disease" id="disease">
+            <option value="diabetes">Diabetes</option>
+            <option value="heart">Heart Disease</option>
+            <option value="parkinsons">Parkinson's Disease</option>
+            <option value="breast">Breast Cancer</option>
+        </select>
+
+        <!-- DIABETES -->
+        <div id="diabetes">
+            <h2>Diabetes Details</h2>
+
+            <input type="number" name="Pregnancies" placeholder="Pregnancies" step="any">
+            <input type="number" name="Glucose" placeholder="Glucose" step="any">
+            <input type="number" name="BloodPressure" placeholder="Blood Pressure" step="any">
+            <input type="number" name="SkinThickness" placeholder="Skin Thickness" step="any">
+            <input type="number" name="Insulin" placeholder="Insulin" step="any">
+            <input type="number" name="BMI" placeholder="BMI" step="any">
+            <input type="number" name="DiabetesPedigreeFunction" placeholder="Diabetes Pedigree Function" step="any">
+            <input type="number" name="Age" placeholder="Age" step="any">
+        </div>
+
+        <!-- HEART -->
+        <div id="heart" style="display:none;">
+            <h2>Heart Disease Details</h2>
+
+            <input type="number" name="age" placeholder="Age" step="any">
+            <input type="number" name="sex" placeholder="Sex (1=Male,0=Female)" step="any">
+            <input type="number" name="cp" placeholder="Chest Pain Type" step="any">
+            <input type="number" name="trestbps" placeholder="Resting Blood Pressure" step="any">
+            <input type="number" name="chol" placeholder="Cholesterol" step="any">
+            <input type="number" name="fbs" placeholder="Fasting Blood Sugar" step="any">
+            <input type="number" name="restecg" placeholder="Rest ECG" step="any">
+            <input type="number" name="thalach" placeholder="Max Heart Rate" step="any">
+            <input type="number" name="exang" placeholder="Exercise Angina" step="any">
+            <input type="number" name="oldpeak" placeholder="Old Peak" step="any">
+            <input type="number" name="slope" placeholder="Slope" step="any">
+            <input type="number" name="ca" placeholder="Major Vessels" step="any">
+            <input type="number" name="thal" placeholder="Thalassemia" step="any">
+        </div>
+
+        <!-- PARKINSONS -->
+        <div id="parkinsons" style="display:none;">
+            <h2>Parkinson's Details</h2>
+
+            <input type="number" name="mdvp_fo" placeholder="MDVP Fo(Hz)" step="any">
+            <input type="number" name="mdvp_fhi" placeholder="MDVP Fhi(Hz)" step="any">
+            <input type="number" name="mdvp_flo" placeholder="MDVP Flo(Hz)" step="any">
+            <input type="number" name="mdvp_jitter" placeholder="MDVP Jitter(%)" step="any">
+            <input type="number" name="mdvp_shimmer" placeholder="MDVP Shimmer" step="any">
+        </div>
+
+        <!-- BREAST CANCER -->
+        <div id="breast" style="display:none;">
+            <h2>Breast Cancer Details</h2>
+
+            <input type="number" name="radius_mean" placeholder="Radius Mean" step="any">
+            <input type="number" name="texture_mean" placeholder="Texture Mean" step="any">
+            <input type="number" name="perimeter_mean" placeholder="Perimeter Mean" step="any">
+            <input type="number" name="area_mean" placeholder="Area Mean" step="any">
+            <input type="number" name="smoothness_mean" placeholder="Smoothness Mean" step="any">
+        </div>
+
+        <br>
+        <button type="submit">Predict</button>
+
+    </form>
+
+    {% if prediction %}
+    <div class="result {{ status }}">
+        <h2>{{ prediction }}</h2>
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
