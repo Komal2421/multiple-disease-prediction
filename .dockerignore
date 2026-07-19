@@ -1,0 +1,38 @@
+# Ignore Python-specific directories and files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Ignore local databases and user secrets
+users.db
+.env
+
+# Ignore system-specific or editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Ignore git-related files
+.git/
+.gitignore
+
+# Ignore build files and local Docker configs
+Dockerfile
+.dockerignore
+
+# Ignore offline training & evaluation pipelines to keep the runtime image lean
+training/
+evaluation/
+check_columns.py
+README.md
+scratch/
+walkthrough.md
+task.md
+implementation_plan.md
