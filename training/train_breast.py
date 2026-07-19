@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import joblib
 
@@ -92,7 +94,8 @@ plt.show()
 
 
 
-X = df.drop("diagnosis", axis=1)
+feature_cols = ['radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean']
+X = df[feature_cols]
 
 y = df["diagnosis"]
 

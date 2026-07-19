@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import joblib
 
@@ -75,7 +77,8 @@ plt.title("Correlation Matrix")
 
 plt.show()
 
-X = df.drop(["name", "status"], axis=1)
+feature_cols = ['MDVP:Fo(Hz)', 'MDVP:Fhi(Hz)', 'MDVP:Flo(Hz)', 'MDVP:Jitter(%)', 'MDVP:Shimmer']
+X = df[feature_cols]
 
 
 y = df["status"]

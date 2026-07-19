@@ -4,3 +4,5 @@ numpy
 scikit-learn
 matplotlib
 joblib
+google-genai
+python-dotenv

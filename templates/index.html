@@ -1,98 +1,378 @@
- <!DOCTYPE html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Multiple Disease Prediction System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MedPredict AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+<body class="dashboard-body">
 
-<body>
-
-<div class="container">
-
-    <h1>🩺 Multiple Disease Prediction System</h1>
-    <p>Select a disease and enter the patient details.</p>
-
-    <form action="/predict" method="POST">
-
-        <label>Select Disease</label>
-
-        <select name="disease" id="disease">
-            <option value="diabetes">Diabetes</option>
-            <option value="heart">Heart Disease</option>
-            <option value="parkinsons">Parkinson's Disease</option>
-            <option value="breast">Breast Cancer</option>
-        </select>
-
-        <!-- DIABETES -->
-        <div id="diabetes">
-            <h2>Diabetes Details</h2>
-
-            <input type="number" name="Pregnancies" placeholder="Pregnancies" step="any">
-            <input type="number" name="Glucose" placeholder="Glucose" step="any">
-            <input type="number" name="BloodPressure" placeholder="Blood Pressure" step="any">
-            <input type="number" name="SkinThickness" placeholder="Skin Thickness" step="any">
-            <input type="number" name="Insulin" placeholder="Insulin" step="any">
-            <input type="number" name="BMI" placeholder="BMI" step="any">
-            <input type="number" name="DiabetesPedigreeFunction" placeholder="Diabetes Pedigree Function" step="any">
-            <input type="number" name="Age" placeholder="Age" step="any">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader-card">
+            <div class="pulse-loader"><i class="fa-solid fa-heart-pulse"></i></div>
+            <h2>Running Diagnostics</h2>
+            <p>Evaluating ML prediction markers and generating Gemini AI clinical explanations...</p>
+            <div class="progress-bar-loader"><div class="progress-fill"></div></div>
         </div>
-
-        <!-- HEART -->
-        <div id="heart" style="display:none;">
-            <h2>Heart Disease Details</h2>
-
-            <input type="number" name="age" placeholder="Age" step="any">
-            <input type="number" name="sex" placeholder="Sex (1=Male,0=Female)" step="any">
-            <input type="number" name="cp" placeholder="Chest Pain Type" step="any">
-            <input type="number" name="trestbps" placeholder="Resting Blood Pressure" step="any">
-            <input type="number" name="chol" placeholder="Cholesterol" step="any">
-            <input type="number" name="fbs" placeholder="Fasting Blood Sugar" step="any">
-            <input type="number" name="restecg" placeholder="Rest ECG" step="any">
-            <input type="number" name="thalach" placeholder="Max Heart Rate" step="any">
-            <input type="number" name="exang" placeholder="Exercise Angina" step="any">
-            <input type="number" name="oldpeak" placeholder="Old Peak" step="any">
-            <input type="number" name="slope" placeholder="Slope" step="any">
-            <input type="number" name="ca" placeholder="Major Vessels" step="any">
-            <input type="number" name="thal" placeholder="Thalassemia" step="any">
-        </div>
-
-        <!-- PARKINSONS -->
-        <div id="parkinsons" style="display:none;">
-            <h2>Parkinson's Details</h2>
-
-            <input type="number" name="mdvp_fo" placeholder="MDVP Fo(Hz)" step="any">
-            <input type="number" name="mdvp_fhi" placeholder="MDVP Fhi(Hz)" step="any">
-            <input type="number" name="mdvp_flo" placeholder="MDVP Flo(Hz)" step="any">
-            <input type="number" name="mdvp_jitter" placeholder="MDVP Jitter(%)" step="any">
-            <input type="number" name="mdvp_shimmer" placeholder="MDVP Shimmer" step="any">
-        </div>
-
-        <!-- BREAST CANCER -->
-        <div id="breast" style="display:none;">
-            <h2>Breast Cancer Details</h2>
-
-            <input type="number" name="radius_mean" placeholder="Radius Mean" step="any">
-            <input type="number" name="texture_mean" placeholder="Texture Mean" step="any">
-            <input type="number" name="perimeter_mean" placeholder="Perimeter Mean" step="any">
-            <input type="number" name="area_mean" placeholder="Area Mean" step="any">
-            <input type="number" name="smoothness_mean" placeholder="Smoothness Mean" step="any">
-        </div>
-
-        <br>
-        <button type="submit">Predict</button>
-
-    </form>
-
-    {% if prediction %}
-    <div class="result {{ status }}">
-        <h2>{{ prediction }}</h2>
     </div>
-    {% endif %}
 
-</div>
+    <!-- Navigation Header -->
+    <header class="main-header">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>MedPredict AI</span>
+        </div>
+        <div class="user-profile">
+            <span>Welcome, <strong>{{ username or 'Clinician' }}</strong></span>
+            <a href="/logout" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </header>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation (Disease Selection) -->
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Risk Engines</h3>
+            <ul class="disease-tabs">
+                <li class="disease-tab {% if not disease or disease == 'Diabetes' %}active{% endif %}" data-target="diabetes">
+                    <i class="fa-solid fa-syringe"></i>
+                    <span>Diabetes Risk</span>
+                </li>
+                <li class="disease-tab {% if disease == 'Heart Disease' %}active{% endif %}" data-target="heart">
+                    <i class="fa-solid fa-heart-crack"></i>
+                    <span>Heart Disease</span>
+                </li>
+                <li class="disease-tab {% if disease == 'Parkinson\'s Disease' %}active{% endif %}" data-target="parkinsons">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>Parkinson's Risk</span>
+                </li>
+                <li class="disease-tab {% if disease == 'Breast Cancer' %}active{% endif %}" data-target="breast">
+                    <i class="fa-solid fa-dna"></i>
+                    <span>Breast Cancer</span>
+                </li>
+            </ul>
+        </aside>
 
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <div class="dashboard-grid">
+                
+                <!-- Left Panel: Diagnostics Form -->
+                <section class="card form-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-file-medical"></i> Patient Diagnostics</h2>
+                        <p>Enter quantitative biomarkers to run prediction</p>
+                    </div>
+
+                    <form action="/predict" method="POST" id="prediction-form">
+                        <!-- Hidden Input to track selected disease -->
+                        <input type="hidden" name="disease" id="disease-input" value="{{ 'diabetes' if not disease else ('heart' if disease == 'Heart Disease' else ('parkinsons' if disease == 'Parkinson\'s Disease' else 'breast')) }}">
+
+                        <!-- DIABETES INPUTS -->
+                        <div id="diabetes-inputs" class="inputs-section" style="display:none;">
+                            <div class="inputs-grid">
+                                <div class="form-group-input">
+                                    <label>Pregnancies</label>
+                                    <input type="number" name="Pregnancies" placeholder="e.g. 2" step="any" value="{{ input_data.get('Pregnancies', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Glucose (mg/dL)</label>
+                                    <input type="number" name="Glucose" placeholder="e.g. 120" step="any" value="{{ input_data.get('Glucose', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Blood Pressure (mmHg)</label>
+                                    <input type="number" name="BloodPressure" placeholder="e.g. 80" step="any" value="{{ input_data.get('Blood Pressure', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Skin Thickness (mm)</label>
+                                    <input type="number" name="SkinThickness" placeholder="e.g. 20" step="any" value="{{ input_data.get('Skin Thickness', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Insulin (µU/mL)</label>
+                                    <input type="number" name="Insulin" placeholder="e.g. 85" step="any" value="{{ input_data.get('Insulin', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>BMI (kg/m²)</label>
+                                    <input type="number" name="BMI" placeholder="e.g. 26.5" step="any" value="{{ input_data.get('BMI', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Pedigree Function</label>
+                                    <input type="number" name="DiabetesPedigreeFunction" placeholder="e.g. 0.47" step="any" value="{{ input_data.get('Diabetes Pedigree Function', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Age (years)</label>
+                                    <input type="number" name="Age" placeholder="e.g. 33" step="any" value="{{ input_data.get('Age', '') if disease == 'Diabetes' else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HEART INPUTS -->
+                        <div id="heart-inputs" class="inputs-section" style="display:none;">
+                            <div class="inputs-grid">
+                                <div class="form-group-input">
+                                    <label>Age (years)</label>
+                                    <input type="number" name="age" placeholder="e.g. 54" step="any" value="{{ input_data.get('Age', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Sex (1=Male, 0=Female)</label>
+                                    <input type="number" name="sex" placeholder="1 or 0" step="any" value="{{ input_data.get('Sex (1=Male, 0=Female)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Chest Pain (0-3)</label>
+                                    <input type="number" name="cp" placeholder="e.g. 1" step="any" value="{{ input_data.get('Chest Pain Type (0-3)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Resting BP (mmHg)</label>
+                                    <input type="number" name="trestbps" placeholder="e.g. 130" step="any" value="{{ input_data.get('Resting Blood Pressure', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Cholesterol (mg/dL)</label>
+                                    <input type="number" name="chol" placeholder="e.g. 240" step="any" value="{{ input_data.get('Cholesterol', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Fasting Blood Sugar</label>
+                                    <input type="number" name="fbs" placeholder="1=True, 0=False" step="any" value="{{ input_data.get('Fasting Blood Sugar (1=True, 0=False)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Rest ECG (0-2)</label>
+                                    <input type="number" name="restecg" placeholder="e.g. 0" step="any" value="{{ input_data.get('Resting ECG (0-2)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Max Heart Rate</label>
+                                    <input type="number" name="thalach" placeholder="e.g. 150" step="any" value="{{ input_data.get('Max Heart Rate', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Ex. Angina (1=Yes, 0=No)</label>
+                                    <input type="number" name="exang" placeholder="1 or 0" step="any" value="{{ input_data.get('Exercise Angina (1=Yes, 0=No)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Old Peak (ST depression)</label>
+                                    <input type="number" name="oldpeak" placeholder="e.g. 1.2" step="any" value="{{ input_data.get('Old Peak', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Slope (0-2)</label>
+                                    <input type="number" name="slope" placeholder="e.g. 1" step="any" value="{{ input_data.get('Slope (0-2)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Major Vessels (0-4)</label>
+                                    <input type="number" name="ca" placeholder="e.g. 0" step="any" value="{{ input_data.get('Major Vessels (0-4)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Thalassemia (0-3)</label>
+                                    <input type="number" name="thal" placeholder="e.g. 2" step="any" value="{{ input_data.get('Thalassemia (0-3)', '') if disease == 'Heart Disease' else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PARKINSONS INPUTS -->
+                        <div id="parkinsons-inputs" class="inputs-section" style="display:none;">
+                            <div class="inputs-grid">
+                                <div class="form-group-input">
+                                    <label>MDVP Fo (Hz)</label>
+                                    <input type="number" name="mdvp_fo" placeholder="e.g. 119.9" step="any" value="{{ input_data.get('MDVP:Fo(Hz)', '') if disease == 'Parkinson\'s Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>MDVP Fhi (Hz)</label>
+                                    <input type="number" name="mdvp_fhi" placeholder="e.g. 157.3" step="any" value="{{ input_data.get('MDVP:Fhi(Hz)', '') if disease == 'Parkinson\'s Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>MDVP Flo (Hz)</label>
+                                    <input type="number" name="mdvp_flo" placeholder="e.g. 75.0" step="any" value="{{ input_data.get('MDVP:Flo(Hz)', '') if disease == 'Parkinson\'s Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>MDVP Jitter (%)</label>
+                                    <input type="number" name="mdvp_jitter" placeholder="e.g. 0.007" step="any" value="{{ input_data.get('MDVP:Jitter(%)', '') if disease == 'Parkinson\'s Disease' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>MDVP Shimmer</label>
+                                    <input type="number" name="mdvp_shimmer" placeholder="e.g. 0.02" step="any" value="{{ input_data.get('MDVP:Shimmer', '') if disease == 'Parkinson\'s Disease' else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BREAST CANCER INPUTS -->
+                        <div id="breast-inputs" class="inputs-section" style="display:none;">
+                            <div class="inputs-grid">
+                                <div class="form-group-input">
+                                    <label>Radius Mean</label>
+                                    <input type="number" name="radius_mean" placeholder="e.g. 14.1" step="any" value="{{ input_data.get('Radius Mean', '') if disease == 'Breast Cancer' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Texture Mean</label>
+                                    <input type="number" name="texture_mean" placeholder="e.g. 19.3" step="any" value="{{ input_data.get('Texture Mean', '') if disease == 'Breast Cancer' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Perimeter Mean</label>
+                                    <input type="number" name="perimeter_mean" placeholder="e.g. 91.5" step="any" value="{{ input_data.get('Perimeter Mean', '') if disease == 'Breast Cancer' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Area Mean</label>
+                                    <input type="number" name="area_mean" placeholder="e.g. 654.8" step="any" value="{{ input_data.get('Area Mean', '') if disease == 'Breast Cancer' else '' }}">
+                                </div>
+                                <div class="form-group-input">
+                                    <label>Smoothness Mean</label>
+                                    <input type="number" name="smoothness_mean" placeholder="e.g. 0.096" step="any" value="{{ input_data.get('Smoothness Mean', '') if disease == 'Breast Cancer' else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary predict-submit-btn">
+                            <span>Execute Risk Projection</span> <i class="fa-solid fa-flask-vial"></i>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Right Panel: Results & AI Insights -->
+                <section class="card results-card">
+                    {% if prediction %}
+                        <div class="card-header border-bottom">
+                            <h2><i class="fa-solid fa-heart-pulse"></i> Forecast Outcome</h2>
+                            <p>Diagnostic output details from model and Gemini AI</p>
+                        </div>
+
+                        <div class="results-dashboard">
+                            <!-- Disease Evaluated -->
+                            <div class="result-row-summary">
+                                <span class="result-label">Disease Target</span>
+                                <span class="result-value-main">{{ disease }}</span>
+                            </div>
+
+                            <!-- Risk Level & Confidence Card -->
+                            <div class="result-details-grid">
+                                <div class="detail-tile risk-tile {% if risk_level == 'High' %}risk-high{% elif risk_level == 'Moderate' %}risk-mod{% else %}risk-low{% endif %}">
+                                    <div class="tile-icon">
+                                        <i class="fa-solid {% if risk_level == 'High' %}fa-triangle-exclamation{% elif risk_level == 'Moderate' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                                    </div>
+                                    <div class="tile-content">
+                                        <h4>Risk Level</h4>
+                                        <p>{{ risk_level }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="detail-tile confidence-tile">
+                                    <div class="tile-icon">
+                                        <i class="fa-solid fa-chart-pie"></i>
+                                    </div>
+                                    <div class="tile-content">
+                                        <h4>Confidence</h4>
+                                        <p>{{ confidence }}%</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confidence Meter -->
+                            <div class="confidence-meter-container">
+                                <div class="meter-label">
+                                    <span>Classifier Confidence</span>
+                                    <span>{{ confidence }}%</span>
+                                </div>
+                                <div class="meter-track">
+                                    <div class="meter-fill {% if risk_level == 'High' %}fill-high{% elif risk_level == 'Moderate' %}fill-mod{% else %}fill-low{% endif %}" style="width: {{ confidence }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Result Prediction Statement -->
+                            <div class="alert alert-{{ status }} prediction-alert">
+                                <i class="fa-solid {% if status == 'danger' %}fa-radiation{% else %}fa-heart-shield{% endif %}"></i>
+                                <span>Verdict: <strong>{{ prediction }}</strong></span>
+                            </div>
+
+                            <!-- Gemini AI Explanation Box -->
+                            <div class="gemini-explanation-box">
+                                <div class="explanation-header">
+                                    <div class="ai-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Analysis</div>
+                                </div>
+                                <div class="explanation-body markdown-content" id="explanation-body">
+                                    <!-- Embedded Markdown content, safe parsed in js -->
+                                    <div id="raw-markdown" style="display:none;">{{ explanation }}</div>
+                                    <div id="parsed-html" class="html-output"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- No Prediction Welcome Screen -->
+                        <div class="welcome-screen">
+                            <div class="welcome-icon"><i class="fa-solid fa-stethoscope"></i></div>
+                            <h2>Risk Forecasting Workspace</h2>
+                            <p>Select a medical diagnostic category from the left panel, input the patient's quantitative measurements, and execute a projection.</p>
+                            <div class="welcome-guide">
+                                <h3>Engine Highlights:</h3>
+                                <ul>
+                                    <li><i class="fa-solid fa-check"></i> High-precision Logistic Classifier pipelines</li>
+                                    <li><i class="fa-solid fa-check"></i> Mathematical confidence & risk stratification</li>
+                                    <li><i class="fa-solid fa-check"></i> Automated clinical synthesis powered by Gemini</li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabs = document.querySelectorAll(".disease-tab");
+            const diseaseInput = document.getElementById("disease-input");
+            const predictionForm = document.getElementById("prediction-form");
+            const loadingOverlay = document.getElementById("loading-overlay");
+
+            // Toggles active fields visible in the left panel
+            function toggleSections(selectedDisease) {
+                let sections = ["diabetes", "heart", "parkinsons", "breast"];
+                
+                sections.forEach(id => {
+                    let div = document.getElementById(id + "-inputs");
+                    if (div) {
+                        div.style.display = "none";
+                        div.querySelectorAll("input").forEach(inp => {
+                            inp.disabled = true;
+                        });
+                    }
+                });
+
+                let activeDiv = document.getElementById(selectedDisease + "-inputs");
+                if (activeDiv) {
+                    activeDiv.style.display = "block";
+                    activeDiv.querySelectorAll("input").forEach(inp => {
+                        inp.disabled = false;
+                    });
+                }
+            }
+
+            // Bind click handler for tabs
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    const target = this.getAttribute("data-target");
+                    diseaseInput.value = target;
+                    
+                    tabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    toggleSections(target);
+                });
+            });
+
+            // On page load, initialize the current disease fields
+            toggleSections(diseaseInput.value);
+
+            // Form Submit Show Loader
+            predictionForm.addEventListener("submit", function() {
+                loadingOverlay.style.display = "flex";
+            });
+
+            // Parse Markdown AI explanation if present
+            const rawMarkdownElement = document.getElementById("raw-markdown");
+            if (rawMarkdownElement) {
+                const mdText = rawMarkdownElement.textContent;
+                document.getElementById("parsed-html").innerHTML = marked.parse(mdText);
+            }
+        });
+    </script>
 </body>
 </html>

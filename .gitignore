@@ -1,7 +1,9 @@
-__pycache__/
+ __pycache__/
 *.pyc
 *.pkl
 *.pkl.lock
 venv/
+.venv/
 .env
+users.db
 .DS_Store
