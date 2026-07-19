@@ -1,6 +1,4 @@
-/* ==========================================================================
-   MedPredict AI - Core Design System & Styles
-   ========================================================================== */
+
 
 :root {
     --bg-main: #f8fafc;
@@ -11,25 +9,25 @@
     --text-light: #94a3b8;
     --text-white: #ffffff;
     
-    /* Branding Colors */
-    --color-primary: #4f46e5;      /* Indigo */
-    --color-primary-hover: #4338ca;
-    --color-accent: #06b6d4;       /* Cyan */
     
-    /* Status Colors */
-    --color-success: #10b981;      /* Emerald Green */
+    --color-primary: #4f46e5;      
+    --color-primary-hover: #4338ca;
+    --color-accent: #06b6d4;       
+    
+    
+    --color-success: #10b981;      
     --color-success-bg: #ecfdf5;
     --color-success-border: #a7f3d0;
     
-    --color-warning: #f59e0b;      /* Amber Yellow */
+    --color-warning: #f59e0b;      
     --color-warning-bg: #fffbeb;
     --color-warning-border: #fde68a;
     
-    --color-danger: #ef4444;       /* Rose Red */
+    --color-danger: #ef4444;       
     --color-danger-bg: #fef2f2;
     --color-danger-border: #fecaca;
     
-    /* Borders & Shadows */
+    
     --border-radius-sm: 8px;
     --border-radius-md: 12px;
     --border-radius-lg: 16px;
@@ -38,14 +36,11 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     
-    /* Animations */
+    
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
 }
 
-/* ==========================================================================
-   Base Reset
-   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -60,9 +55,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* ==========================================================================
-   Authentication Pages Structure
-   ========================================================================== */
 .auth-body {
     display: flex;
     align-items: center;
@@ -115,7 +107,6 @@ body {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
-/* Form Styles */
 .form-group {
     margin-bottom: 20px;
 }
@@ -152,7 +143,6 @@ body {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-/* Password eye toggle */
 .password-wrapper {
     position: relative;
     display: flex;
@@ -180,7 +170,6 @@ body {
     color: var(--color-primary);
 }
 
-/* Buttons */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -228,7 +217,6 @@ body {
     text-decoration: underline;
 }
 
-/* Alerts */
 .alert {
     display: flex;
     align-items: flex-start;
@@ -264,16 +252,12 @@ body {
     border-color: var(--color-success-border);
 }
 
-/* ==========================================================================
-   Dashboard Workspace Layout
-   ========================================================================== */
 .dashboard-body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Main Navigation Header */
 .main-header {
     display: flex;
     align-items: center;
@@ -331,21 +315,19 @@ body {
     border-color: var(--color-danger-border);
 }
 
-/* Wrapper */
 .dashboard-wrapper {
     display: flex;
     flex: 1;
 }
 
-/* Sidebar disease selector */
 .sidebar {
     width: 260px;
-    background-color: var(--bg-sidebar);
-    color: var(--text-white);
+    background-color: #ffffff;
+    color: var(--text-primary);
     padding: 30px 16px;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #1e293b;
+    border-right: 1px solid #e2e8f0;
 }
 
 .sidebar-title {
@@ -373,7 +355,7 @@ body {
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-light);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all var(--transition-fast);
 }
@@ -385,8 +367,8 @@ body {
 }
 
 .disease-tab:hover {
-    color: var(--text-white);
-    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    background-color: #f1f5f9;
 }
 
 .disease-tab.active {
@@ -395,11 +377,17 @@ body {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-/* Main workspace */
 .main-content {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+    background-image: linear-gradient(
+        rgba(8, 26, 54, 0.75), 
+        rgba(6, 23, 47, 0.8)
+    ), url('/static/healthcare_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .dashboard-grid {
@@ -417,7 +405,6 @@ body {
     }
 }
 
-/* Cards */
 .card {
     background-color: var(--bg-card);
     border-radius: var(--border-radius-md);
@@ -453,7 +440,6 @@ body {
     margin-top: 4px;
 }
 
-/* Inputs grid */
 .inputs-section {
     padding: 0 30px 24px 30px;
 }
@@ -498,7 +484,6 @@ body {
     width: calc(100% - 60px);
 }
 
-/* Results panel */
 .results-dashboard {
     padding: 30px;
     display: flex;
@@ -532,7 +517,6 @@ body {
     gap: 16px;
 }
 
-/* Detail tiles */
 .detail-tile {
     display: flex;
     align-items: center;
@@ -567,15 +551,16 @@ body {
     color: var(--bg-sidebar);
 }
 
-/* Risk states styles */
 .risk-tile.risk-high {
     background-color: var(--color-danger-bg);
     border-color: var(--color-danger-border);
 }
+
 .risk-tile.risk-high .tile-icon {
     background-color: var(--color-danger);
     color: var(--text-white);
 }
+
 .risk-tile.risk-high .tile-content p {
     color: #ef4444;
 }
@@ -584,10 +569,12 @@ body {
     background-color: var(--color-warning-bg);
     border-color: var(--color-warning-border);
 }
+
 .risk-tile.risk-mod .tile-icon {
     background-color: var(--color-warning);
     color: var(--text-white);
 }
+
 .risk-tile.risk-mod .tile-content p {
     color: #d97706;
 }
@@ -596,15 +583,16 @@ body {
     background-color: var(--color-success-bg);
     border-color: var(--color-success-border);
 }
+
 .risk-tile.risk-low .tile-icon {
     background-color: var(--color-success);
     color: var(--text-white);
 }
+
 .risk-tile.risk-low .tile-content p {
     color: #10b981;
 }
 
-/* Confidence meter */
 .confidence-meter-container {
     background-color: var(--bg-main);
     padding: 16px;
@@ -638,9 +626,11 @@ body {
 .meter-fill.fill-high {
     background-color: var(--color-danger);
 }
+
 .meter-fill.fill-mod {
     background-color: var(--color-warning);
 }
+
 .meter-fill.fill-low {
     background-color: var(--color-success);
 }
@@ -652,7 +642,6 @@ body {
     border-radius: var(--border-radius-md);
 }
 
-/* Gemini AI Card */
 .gemini-explanation-box {
     margin-top: 10px;
     background-color: var(--bg-main);
@@ -688,14 +677,13 @@ body {
     color: #334155;
 }
 
-/* Markdown parsing output styling */
 .markdown-content p {
     margin-bottom: 12px;
     line-height: 1.6;
 }
 
-.markdown-content h1, 
-.markdown-content h2, 
+.markdown-content h1,
+.markdown-content h2,
 .markdown-content h3 {
     color: var(--bg-sidebar);
     margin-top: 18px;
@@ -703,11 +691,19 @@ body {
     font-weight: 700;
 }
 
-.markdown-content h1 { font-size: 18px; }
-.markdown-content h2 { font-size: 16px; }
-.markdown-content h3 { font-size: 14.5px; }
+.markdown-content h1 {
+    font-size: 18px;
+}
 
-.markdown-content ul, 
+.markdown-content h2 {
+    font-size: 16px;
+}
+
+.markdown-content h3 {
+    font-size: 14.5px;
+}
+
+.markdown-content ul,
 .markdown-content ol {
     margin-left: 20px;
     margin-bottom: 14px;
@@ -722,7 +718,6 @@ body {
     color: var(--bg-sidebar);
 }
 
-/* Welcome Screen */
 .welcome-screen {
     padding: 60px 40px;
     text-align: center;
@@ -792,89 +787,76 @@ body {
     color: var(--color-primary);
 }
 
-/* ==========================================================================
-   Loading Overlay
-   ========================================================================== */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 20px;
+.spinner-loader {
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(226, 232, 240, 0.8);
+    border-top: 4px solid var(--color-primary);
+    border-radius: var(--border-radius-full);
+    margin: 20px auto 0 auto;
+    animation: spin 1s linear infinite;
 }
 
-.loader-card {
-    background-color: var(--bg-card);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    width: 100%;
-    max-width: 440px;
-    padding: 40px;
+.explanation-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
     text-align: center;
 }
 
-.pulse-loader {
+.explanation-loading p {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    margin-top: 16px;
+    font-weight: 500;
+}
+
+.loading-dots {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    border-radius: var(--border-radius-full);
-    background-color: var(--color-danger-bg);
-    color: var(--color-danger);
-    font-size: 32px;
-    margin-bottom: 24px;
-    animation: pulse 1.5s ease-in-out infinite;
+    gap: 6px;
 }
 
-.loader-card h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--bg-sidebar);
-    margin-bottom: 10px;
+.loading-dots span {
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: bounce-dots 1.4s infinite both;
 }
 
-.loader-card p {
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.explanation-error-placeholder {
+    padding: 20px;
+    background-color: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
+    border-radius: var(--border-radius-md);
+    color: #b45309;
     font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 24px;
+    line-height: 1.5;
 }
 
-.progress-bar-loader {
-    width: 100%;
-    height: 6px;
-    background-color: #e2e8f0;
-    border-radius: var(--border-radius-full);
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    width: 50%;
-    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
-    border-radius: var(--border-radius-full);
-    animation: slide 1.5s ease-in-out infinite;
-}
-
-/* ==========================================================================
-   CSS Keyframe Animations
-   ========================================================================== */
 @keyframes pulse {
     0% {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
     }
+
     70% {
         transform: scale(1.1);
         box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
     }
+
     100% {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
@@ -882,16 +864,40 @@ body {
 }
 
 @keyframes float {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-    100% { transform: translateY(0); }
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
 }
 
-@keyframes slide {
+@keyframes spin {
     0% {
-        margin-left: -50%;
+        transform: rotate(0deg);
     }
+
     100% {
-        margin-left: 100%;
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce-dots {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.3;
+    }
+
+    40% {
+        transform: scale(1.0);
+        opacity: 1;
     }
 }

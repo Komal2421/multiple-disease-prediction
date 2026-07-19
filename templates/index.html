@@ -3,29 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - MedPredict AI</title>
+    <title>Dashboard - MedPredict</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="dashboard-body">
-
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="loader-card">
-            <div class="pulse-loader"><i class="fa-solid fa-heart-pulse"></i></div>
-            <h2>Running Diagnostics</h2>
-            <p>Evaluating ML prediction markers and generating Gemini AI clinical explanations...</p>
-            <div class="progress-bar-loader"><div class="progress-fill"></div></div>
-        </div>
-    </div>
-
     <!-- Navigation Header -->
     <header class="main-header">
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
-            <span>MedPredict AI</span>
+            <span>MedPredict</span>
         </div>
         <div class="user-profile">
             <span>Welcome, <strong>{{ username or 'Clinician' }}</strong></span>
@@ -36,7 +25,7 @@
     <div class="dashboard-wrapper">
         <!-- Sidebar Navigation (Disease Selection) -->
         <aside class="sidebar">
-            <h3 class="sidebar-title">Risk Engines</h3>
+            <h3 class="sidebar-title">Health Assessments</h3>
             <ul class="disease-tabs">
                 <li class="disease-tab {% if not disease or disease == 'Diabetes' %}active{% endif %}" data-target="diabetes">
                     <i class="fa-solid fa-syringe"></i>
@@ -61,11 +50,11 @@
         <main class="main-content">
             <div class="dashboard-grid">
                 
-                <!-- Left Panel: Diagnostics Form -->
+                <!-- Left Panel: Patient Health Metrics Form -->
                 <section class="card form-card">
                     <div class="card-header">
-                        <h2><i class="fa-solid fa-file-medical"></i> Patient Diagnostics</h2>
-                        <p>Enter quantitative biomarkers to run prediction</p>
+                        <h2><i class="fa-solid fa-file-medical"></i> Patient Health Metrics</h2>
+                        <p>Enter clinical measurements to evaluate risk</p>
                     </div>
 
                     <form action="/predict" method="POST" id="prediction-form">
@@ -221,7 +210,7 @@
                         </div>
 
                         <button type="submit" class="btn-primary predict-submit-btn">
-                            <span>Execute Risk Projection</span> <i class="fa-solid fa-flask-vial"></i>
+                            <span>Assess Health Risk</span> <i class="fa-solid fa-notes-medical"></i>
                         </button>
                     </form>
                 </section>
@@ -230,25 +219,25 @@
                 <section class="card results-card">
                     {% if prediction %}
                         <div class="card-header border-bottom">
-                            <h2><i class="fa-solid fa-heart-pulse"></i> Forecast Outcome</h2>
-                            <p>Diagnostic output details from model and Gemini AI</p>
+                            <h2><i class="fa-solid fa-heart-pulse"></i> Assessment Output</h2>
+                            <p>Comprehensive risk status and personalized insights</p>
                         </div>
 
                         <div class="results-dashboard">
-                            <!-- Disease Evaluated -->
+                            <!-- Target Condition -->
                             <div class="result-row-summary">
-                                <span class="result-label">Disease Target</span>
+                                <span class="result-label">Target Condition</span>
                                 <span class="result-value-main">{{ disease }}</span>
                             </div>
 
-                            <!-- Risk Level & Confidence Card -->
+                            <!-- Risk Level & Certainty Card -->
                             <div class="result-details-grid">
                                 <div class="detail-tile risk-tile {% if risk_level == 'High' %}risk-high{% elif risk_level == 'Moderate' %}risk-mod{% else %}risk-low{% endif %}">
                                     <div class="tile-icon">
                                         <i class="fa-solid {% if risk_level == 'High' %}fa-triangle-exclamation{% elif risk_level == 'Moderate' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
                                     </div>
                                     <div class="tile-content">
-                                        <h4>Risk Level</h4>
+                                        <h4>Risk Status</h4>
                                         <p>{{ risk_level }}</p>
                                     </div>
                                 </div>
@@ -258,16 +247,16 @@
                                         <i class="fa-solid fa-chart-pie"></i>
                                     </div>
                                     <div class="tile-content">
-                                        <h4>Confidence</h4>
+                                        <h4>Certainty</h4>
                                         <p>{{ confidence }}%</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Confidence Meter -->
+                            <!-- Certainty Meter -->
                             <div class="confidence-meter-container">
                                 <div class="meter-label">
-                                    <span>Classifier Confidence</span>
+                                    <span>Certainty Rating</span>
                                     <span>{{ confidence }}%</span>
                                 </div>
                                 <div class="meter-track">
@@ -278,13 +267,13 @@
                             <!-- Result Prediction Statement -->
                             <div class="alert alert-{{ status }} prediction-alert">
                                 <i class="fa-solid {% if status == 'danger' %}fa-radiation{% else %}fa-heart-shield{% endif %}"></i>
-                                <span>Verdict: <strong>{{ prediction }}</strong></span>
+                                <span>Status: <strong>{{ prediction }}</strong></span>
                             </div>
 
-                            <!-- Gemini AI Explanation Box -->
+                            <!-- Clinical Insights Box -->
                             <div class="gemini-explanation-box">
                                 <div class="explanation-header">
-                                    <div class="ai-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Analysis</div>
+                                    <div class="ai-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Personalized Insights</div>
                                 </div>
                                 <div class="explanation-body markdown-content" id="explanation-body">
                                     <!-- Embedded Markdown content, safe parsed in js -->
@@ -294,17 +283,17 @@
                             </div>
                         </div>
                     {% else %}
-                        <!-- No Prediction Welcome Screen -->
+                        <!-- Welcome Screen -->
                         <div class="welcome-screen">
                             <div class="welcome-icon"><i class="fa-solid fa-stethoscope"></i></div>
-                            <h2>Risk Forecasting Workspace</h2>
-                            <p>Select a medical diagnostic category from the left panel, input the patient's quantitative measurements, and execute a projection.</p>
+                            <h2>Clinical Assessment Workspace</h2>
+                            <p>Select a health category from the left panel, input the patient's measurements, and perform the assessment.</p>
                             <div class="welcome-guide">
-                                <h3>Engine Highlights:</h3>
+                                <h3>Features & Capabilities:</h3>
                                 <ul>
-                                    <li><i class="fa-solid fa-check"></i> High-precision Logistic Classifier pipelines</li>
-                                    <li><i class="fa-solid fa-check"></i> Mathematical confidence & risk stratification</li>
-                                    <li><i class="fa-solid fa-check"></i> Automated clinical synthesis powered by Gemini</li>
+                                    <li><i class="fa-solid fa-check"></i> High-precision diagnostic tracking</li>
+                                    <li><i class="fa-solid fa-check"></i> Quantitative risk level stratification</li>
+                                    <li><i class="fa-solid fa-check"></i> Personalized preventive health guidelines</li>
                                 </ul>
                             </div>
                         </div>
@@ -361,16 +350,100 @@
             // On page load, initialize the current disease fields
             toggleSections(diseaseInput.value);
 
-            // Form Submit Show Loader
+            // Form Submit Button handling: disable button, change text to "Analyzing...", and show spinner icon inside
             predictionForm.addEventListener("submit", function() {
-                loadingOverlay.style.display = "flex";
+                const submitBtn = predictionForm.querySelector(".predict-submit-btn");
+                if (submitBtn) {
+                    // Inject small spinner and new text
+                    submitBtn.innerHTML = `
+                        <span>Analyzing...</span> <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    `;
+                    // Delay disabling slightly to prevent browser from cancelling form submission
+                    setTimeout(() => {
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = "0.7";
+                        submitBtn.style.cursor = "not-allowed";
+                    }, 5);
+                }
             });
 
-            // Parse Markdown AI explanation if present
+            // Background loading logic for clinical insights
             const rawMarkdownElement = document.getElementById("raw-markdown");
+            const parsedHtmlDiv = document.getElementById("parsed-html");
+            
             if (rawMarkdownElement) {
-                const mdText = rawMarkdownElement.textContent;
-                document.getElementById("parsed-html").innerHTML = marked.parse(mdText);
+                const mdText = rawMarkdownElement.textContent.trim();
+                
+                if (mdText === "PENDING") {
+                    // Show animated loading dots placeholder
+                    parsedHtmlDiv.innerHTML = `
+                        <div class="explanation-loading">
+                            <div class="loading-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <p>Preparing personalized health insights...</p>
+                        </div>
+                    `;
+                    
+                    const disease = "{{ disease }}";
+                    const prediction = "{{ prediction }}";
+                    const riskLevel = "{{ risk_level }}";
+                    const confidence = parseFloat("{{ confidence }}") || 0.0;
+                    
+                    const features = {};
+                    {% if input_data %}
+                        {% for k, v in input_data.items() %}
+                            features["{{ k }}"] = parseFloat("{{ v }}") || 0.0;
+                        {% endfor %}
+                    {% endif %}
+                    
+                    fetch("/get_explanation", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            disease: disease,
+                            prediction: prediction,
+                            risk_level: riskLevel,
+                            confidence: confidence,
+                            features: features
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("HTTP error: " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.explanation) {
+                            // If explanation was generated successfully
+                            if (data.explanation.includes("Failed to generate") || data.explanation.includes("temporarily unavailable")) {
+                                parsedHtmlDiv.innerHTML = `
+                                    <div class="explanation-error-placeholder">
+                                        Personalized health insights are temporarily unavailable. Your assessment has been completed successfully.
+                                    </div>
+                                `;
+                            } else {
+                                parsedHtmlDiv.innerHTML = marked.parse(data.explanation);
+                            }
+                        } else {
+                            throw new Error("Invalid response format");
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error generating insights:", err);
+                        parsedHtmlDiv.innerHTML = `
+                            <div class="explanation-error-placeholder">
+                                Personalized health insights are temporarily unavailable. Your assessment has been completed successfully.
+                            </div>
+                        `;
+                    });
+                } else {
+                    // If explanation is pre-calculated, parse markdown directly
+                    parsedHtmlDiv.innerHTML = marked.parse(mdText);
+                }
             }
         });
     </script>

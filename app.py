@@ -7,15 +7,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-# Load environment variables before accessing any env vars
-# override=True forces re-read even if env vars were already set (important
-# when the server auto-reloads while .env was edited)
 load_dotenv(override=True)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "medpredict_super_secret_key_123!")
 
-# Verify and load GEMINI_API_KEY using os.getenv
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 gemini_client = None
@@ -23,13 +19,11 @@ if not GEMINI_API_KEY:
     print("CRITICAL CONFIGURATION ERROR: The 'GEMINI_API_KEY' environment variable is missing or empty! Gemini AI recommendations will be disabled.")
 else:
     try:
-        # Initialize Gemini GenAI Client
         gemini_client = genai.Client(api_key=GEMINI_API_KEY)
         print("Gemini GenAI SDK client initialized successfully.")
     except Exception as e:
         print(f"CRITICAL INITIALIZATION ERROR: Failed to initialize the Gemini SDK: {e}")
 
-# Load models and scalers
 diabetes_model = joblib.load("models/diabetes_model.pkl")
 heart_model = joblib.load("models/heart_model.pkl")
 parkinsons_model = joblib.load("models/parkinsons_model.pkl")
@@ -40,7 +34,6 @@ heart_scaler = joblib.load("models/heart_scaler.pkl")
 parkinsons_scaler = joblib.load("models/parkinsons_scaler.pkl")
 breast_scaler = joblib.load("models/breast_scaler.pkl")
 
-# Database helper functions
 DATABASE = 'users.db'
 
 def get_db():
@@ -59,13 +52,15 @@ def init_db():
         ''')
         conn.commit()
 
-# Initialize DB on start
 init_db()
 
 def safe_float(value):
     if value is None or value == "":
         return 0.0
     return float(value)
+
+import sys
+import traceback
 
 def generate_ai_explanation(disease_name, result, risk_level, confidence, features):
     if not gemini_client:
@@ -92,28 +87,43 @@ Please structure your explanation as follows:
 
 Make your response clean, professional, and empathetic, formatted in markdown with bullet points and bold highlights.
 """
-    try:
-        # Using gemini-2.0-flash — the current stable model for the google-genai SDK
-        response = gemini_client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        err = str(e)
-        # Provide a clear, user-friendly message for rate-limit (free-tier quota) errors
-        if "429" in err or "RESOURCE_EXHAUSTED" in err:
-            return (
-                "**Gemini AI is temporarily unavailable** due to API rate limits on the free tier. "
-                "The explanation could not be generated right now. Please wait a moment and try again, "
-                "or consider upgrading your Gemini API plan at [ai.google.dev](https://ai.google.dev)."
+    candidate_models = [
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3.1-flash-lite",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest"
+    ]
+    
+    last_error = None
+    for model_name in candidate_models:
+        try:
+            print(f"[Gemini AI] Attempting explanation generation using model: {model_name}...")
+            response = gemini_client.models.generate_content(
+                model=model_name,
+                contents=prompt
             )
-        return f"Failed to generate AI explanation. Error details: {err}"
+            print(f"[Gemini AI] SUCCESS: Generated explanation using model: {model_name}")
+            return response.text
+        except Exception as e:
+            last_error = e
+            print(f"[Gemini AI] WARNING: Failed to generate using model '{model_name}': {e}", file=sys.stderr)
+            
+    print("\n[Gemini AI] CRITICAL: All fallback models failed to generate content. Last exception traceback:", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+    
+    err_msg = str(last_error)
+    if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
+        return (
+            "**Gemini AI is temporarily unavailable** due to API rate limits on the free tier. "
+            "The explanation could not be generated right now. Please wait a moment and try again, "
+            "or consider upgrading your Gemini API plan at [ai.google.dev](https://ai.google.dev)."
+        )
+    return f"Failed to generate AI explanation. Error details: {err_msg}"
 
-# Route protection middleware
 @app.before_request
 def require_login():
-    # Endpoints that do not require authentication
     allowed_endpoints = ['login', 'register', 'static']
     if request.endpoint and request.endpoint not in allowed_endpoints:
         if 'user_id' not in session:
@@ -290,7 +300,6 @@ def predict():
             result = "No Cancer"
             status = "safe"
 
-    # Calculate Confidence and Risk Level
     confidence_val = p_disease if status == "danger" else (1.0 - p_disease)
     confidence_pct = round(confidence_val * 100, 1)
     
@@ -308,14 +317,7 @@ def predict():
         "breast": "Breast Cancer"
     }.get(disease, disease.capitalize())
 
-    # Call Gemini for AI explanation
-    explanation = generate_ai_explanation(
-        disease_display,
-        result,
-        risk_level,
-        confidence_pct,
-        feature_dict
-    )
+    explanation = "PENDING"
 
     return render_template(
         "index.html",
@@ -328,6 +330,26 @@ def predict():
         input_data=feature_dict,
         username=session.get('username')
     )
+
+@app.route("/get_explanation", methods=["POST"])
+def get_explanation():
+    if 'user_id' not in session:
+        return {"explanation": "Personalized health insights are temporarily unavailable. Your assessment has been completed successfully."}, 401
+        
+    try:
+        data = request.get_json() or {}
+        disease = data.get("disease", "")
+        prediction = data.get("prediction", "")
+        risk_level = data.get("risk_level", "")
+        confidence = data.get("confidence", 0.0)
+        features = data.get("features", {})
+        
+        explanation = generate_ai_explanation(disease, prediction, risk_level, confidence, features)
+        return {"explanation": explanation}
+    except Exception as e:
+        print(f"Error in get_explanation endpoint: {e}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        return {"explanation": "Personalized health insights are temporarily unavailable. Your assessment has been completed successfully."}
 
 if __name__ == "__main__":
     app.run(debug=True)

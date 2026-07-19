@@ -1,128 +1,29 @@
+import os
+import sys
 import pandas as pd
-import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import joblib
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.append(project_root)
 
+from training.utils import train_evaluate_compare
 
+def main():
+    data_path = os.path.join(project_root, "datasets", "parkinsons.csv")
+    print(f"Loading dataset from: {data_path}")
+    df = pd.read_csv(data_path)
+    
+    feature_cols = ['MDVP:Fo(Hz)', 'MDVP:Fhi(Hz)', 'MDVP:Flo(Hz)', 'MDVP:Jitter(%)', 'MDVP:Shimmer']
+    X = df[feature_cols]
+    y = df["status"]
+    
+    train_evaluate_compare(
+        X=X,
+        y=y,
+        disease_name="Parkinson's Disease",
+        model_save_path=os.path.join(project_root, "models", "parkinsons_model.pkl"),
+        scaler_save_path=os.path.join(project_root, "models", "parkinsons_scaler.pkl")
+    )
 
-df = pd.read_csv("datasets/parkinsons.csv")
-print(df.columns)
-
-
-print("First Five Rows")
-print(df.head())
-
-print("\nDataset Shape")
-print(df.shape)
-
-print("\nColumn Names")
-print(df.columns)
-
-print("\nDataset Information")
-print(df.info())
-
-print("\nStatistical Summary")
-print(df.describe())
-
-print("\nMissing Values")
-print(df.isnull().sum())
-
-
-
-# Parkinson's Distribution
-plt.figure(figsize=(6,4))
-df["status"].value_counts().plot(kind="bar")
-
-plt.title("Parkinson's Disease Distribution")
-plt.xlabel("Status")
-plt.ylabel("Count")
-
-plt.show()
-
-
-# Age-independent feature example
-plt.figure(figsize=(7,5))
-
-plt.hist(df["MDVP:Fo(Hz)"], bins=20)
-
-plt.title("Distribution of MDVP:Fo(Hz)")
-plt.xlabel("MDVP:Fo(Hz)")
-plt.ylabel("Frequency")
-
-plt.show()
-
-
-# Correlation Matrix
-plt.figure(figsize=(10,8))
-
-plt.imshow(df.corr(numeric_only=True), cmap="coolwarm")
-
-plt.colorbar()
-
-plt.xticks(range(len(df.select_dtypes(include='number').columns)),
-           df.select_dtypes(include='number').columns,
-           rotation=90)
-
-plt.yticks(range(len(df.select_dtypes(include='number').columns)),
-           df.select_dtypes(include='number').columns)
-
-plt.title("Correlation Matrix")
-
-plt.show()
-
-feature_cols = ['MDVP:Fo(Hz)', 'MDVP:Fhi(Hz)', 'MDVP:Flo(Hz)', 'MDVP:Jitter(%)', 'MDVP:Shimmer']
-X = df[feature_cols]
-
-
-y = df["status"]
-
-
-
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42
-)
-
-
-
-
-scaler = StandardScaler()
-
-X_train = scaler.fit_transform(X_train)
-
-X_test = scaler.transform(X_test)
-
-
-
-model = LogisticRegression(max_iter=1000)
-
-model.fit(X_train, y_train)
-
-
-
-
-y_pred = model.predict(X_test)
-
-
-
-accuracy = accuracy_score(y_test, y_pred)
-
-print("\nModel Accuracy :", accuracy)
-
-
-
-joblib.dump(model, "models/parkinsons_model.pkl")
-
-joblib.dump(scaler, "models/parkinsons_scaler.pkl")
-
-print("\nParkinson's Model Saved Successfully")
+if __name__ == "__main__":
+    main()
