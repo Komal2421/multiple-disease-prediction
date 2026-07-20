@@ -1,4 +1,6 @@
 Flask
+Flask-WTF
+Flask-Limiter
 pandas
 numpy
 scikit-learn

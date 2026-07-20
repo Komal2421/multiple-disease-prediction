@@ -27,9 +27,11 @@ users.db
 Dockerfile
 .dockerignore
 
-# Ignore offline training & evaluation pipelines to keep the runtime image lean
+# Ignore offline training, evaluation pipelines, tests, and docs to keep the runtime image lean
 training/
 evaluation/
+tests/
+docs/
 check_columns.py
 README.md
 scratch/

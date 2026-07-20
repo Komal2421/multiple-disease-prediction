@@ -20,15 +20,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy the necessary application folders and files into the container
-COPY templates/ ./templates/
-COPY static/ ./static/
-COPY datasets/ ./datasets/
+# Copy application package and required folders/files into the container
+COPY app/ ./app/
 COPY models/ ./models/
+COPY datasets/ ./datasets/
+COPY run.py .
 COPY app.py .
 
 # Expose port 5000, which is the application's binding port
 EXPOSE 5000
 
 # Run the Flask application using Gunicorn for production readiness
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "run:app"]
